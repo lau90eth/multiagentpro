@@ -41,7 +41,7 @@ class MultiAgentPro(gl.Contract):
         self.task_count = self.task_count + 1
 
     @gl.public.write
-    def submit_result(self, task_id: u256, result: str) -> None:
+    def submit_result(self, task_id: int, result: str) -> None:
         tasks = self._get_tasks()
         tid = str(int(task_id))
         if tid not in tasks:
@@ -89,7 +89,7 @@ class MultiAgentPro(gl.Contract):
         self._set_rep(rep)
 
     @gl.public.view
-    def get_task(self, task_id: u256) -> str:
+    def get_task(self, task_id: int) -> str:
         tasks = self._get_tasks()
         tid = str(int(task_id))
         if tid not in tasks:
@@ -110,7 +110,7 @@ class MultiAgentPro(gl.Contract):
         return str(self.task_count)
 
     @gl.public.view
-    def get_status(self, task_id: u256) -> str:
+    def get_status(self, task_id: int) -> str:
         tasks = self._get_tasks()
         tid = str(int(task_id))
         if tid not in tasks:
@@ -118,7 +118,7 @@ class MultiAgentPro(gl.Contract):
         return tasks[tid]["status"]
 
     @gl.public.view
-    def get_result(self, task_id: u256) -> str:
+    def get_result(self, task_id: int) -> str:
         tasks = self._get_tasks()
         tid = str(int(task_id))
         if tid not in tasks:
