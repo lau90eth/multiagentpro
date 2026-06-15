@@ -25,15 +25,17 @@ class MultiAgentPro(gl.Contract):
         self.rep_json = json.dumps(d)
 
     @gl.public.write
-    def post_task(self, description: str, rubric: str) -> None:
+    def post_task(self, description: str, rubric: str, reward_gen: u256) -> None:
         task_id = int(self.task_count)
         tasks = self._get_tasks()
         tasks[str(task_id)] = {
             "description": description[:500],
             "rubric": rubric[:300],
+            "reward": int(reward_gen),
             "status": "open",
             "result": "",
-            "submitter": ""
+            "submitter": "",
+            "poster": str(gl.message.sender_address)
         }
         self._set_tasks(tasks)
         self.task_count = self.task_count + 1
@@ -93,7 +95,7 @@ class MultiAgentPro(gl.Contract):
         if tid not in tasks:
             return "Task not found"
         t = tasks[tid]
-        return f"Task: {t['description']} | Rubric: {t['rubric']} | Status: {t['status']}"
+        return f"Task: {t['description']} | Rubric: {t['rubric']} | Status: {t['status']} | Reward: {t['reward']} GEN"
 
     @gl.public.view
     def get_reputation(self, agent: str) -> str:
@@ -114,3 +116,11 @@ class MultiAgentPro(gl.Contract):
         if tid not in tasks:
             return "not found"
         return tasks[tid]["status"]
+
+    @gl.public.view
+    def get_result(self, task_id: u256) -> str:
+        tasks = self._get_tasks()
+        tid = str(int(task_id))
+        if tid not in tasks:
+            return "not found"
+        return tasks[tid]["result"]
