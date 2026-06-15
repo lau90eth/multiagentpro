@@ -1,38 +1,53 @@
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 from genlayer import *
+import json
 
 class MultiAgentPro(gl.Contract):
     task_count: u256
-    tasks: gl.TreeMap[u256, str]
-    rubrics: gl.TreeMap[u256, str]
-    rewards: gl.TreeMap[u256, u256]
-    results: gl.TreeMap[u256, str]
-    submitters: gl.TreeMap[u256, str]
-    status: gl.TreeMap[u256, str]
-    rep_completed: gl.TreeMap[str, u256]
-    rep_failed: gl.TreeMap[str, u256]
+    tasks_json: str
+    rep_json: str
 
     def __init__(self):
         self.task_count = 0
+        self.tasks_json = "{}"
+        self.rep_json = "{}"
+
+    def _get_tasks(self) -> dict:
+        return json.loads(self.tasks_json)
+
+    def _set_tasks(self, d: dict):
+        self.tasks_json = json.dumps(d)
+
+    def _get_rep(self) -> dict:
+        return json.loads(self.rep_json)
+
+    def _set_rep(self, d: dict):
+        self.rep_json = json.dumps(d)
 
     @gl.public.write
     def post_task(self, description: str, rubric: str) -> None:
-        reward = gl.message.value
-        if reward == 0:
-            raise Exception("Must send nonzero reward")
-        task_id = self.task_count
-        self.tasks[task_id] = description[:500]
-        self.rubrics[task_id] = rubric[:300]
-        self.rewards[task_id] = reward
-        self.status[task_id] = "open"
+        task_id = int(self.task_count)
+        tasks = self._get_tasks()
+        tasks[str(task_id)] = {
+            "description": description[:500],
+            "rubric": rubric[:300],
+            "status": "open",
+            "result": "",
+            "submitter": ""
+        }
+        self._set_tasks(tasks)
         self.task_count = self.task_count + 1
 
     @gl.public.write
     def submit_result(self, task_id: u256, result: str) -> None:
-        if self.status[task_id] != "open":
+        tasks = self._get_tasks()
+        tid = str(int(task_id))
+        if tid not in tasks:
+            raise Exception("Task not found")
+        if tasks[tid]["status"] != "open":
             raise Exception("Task not open")
-        task = self.tasks[task_id]
-        rubric = self.rubrics[task_id]
+        task = tasks[tid]["description"]
+        rubric = tasks[tid]["rubric"]
         agent = str(gl.message.sender_address)
 
         def leader_fn() -> str:
@@ -54,30 +69,39 @@ class MultiAgentPro(gl.Contract):
         verdict = gl.vm.run_nondet_unsafe(leader_fn, validator_fn)
         verdict = verdict.replace('\x00', '').strip()
 
-        self.results[task_id] = result[:500]
-        self.submitters[task_id] = agent
+        tasks[tid]["result"] = result[:500]
+        tasks[tid]["submitter"] = agent
 
-        prev_completed = self.rep_completed.get(agent) or u256(0)
-        prev_failed = self.rep_failed.get(agent) or u256(0)
+        rep = self._get_rep()
+        if agent not in rep:
+            rep[agent] = {"completed": 0, "failed": 0}
 
         if verdict == "APPROVED":
-            self.status[task_id] = "completed"
-            self.rep_completed[agent] = prev_completed + u256(1)
-            reward = self.rewards[task_id]
-            gl.chain.account(gl.message.sender_address).emit_transfer(reward)
+            tasks[tid]["status"] = "completed"
+            rep[agent]["completed"] += 1
         else:
-            self.status[task_id] = "failed"
-            self.rep_failed[agent] = prev_failed + u256(1)
+            tasks[tid]["status"] = "failed"
+            rep[agent]["failed"] += 1
+
+        self._set_tasks(tasks)
+        self._set_rep(rep)
 
     @gl.public.view
     def get_task(self, task_id: u256) -> str:
-        return f"Task: {self.tasks[task_id]} | Rubric: {self.rubrics[task_id]} | Status: {self.status[task_id]} | Reward: {self.rewards[task_id]}"
+        tasks = self._get_tasks()
+        tid = str(int(task_id))
+        if tid not in tasks:
+            return "Task not found"
+        t = tasks[tid]
+        return f"Task: {t['description']} | Rubric: {t['rubric']} | Status: {t['status']}"
 
     @gl.public.view
     def get_reputation(self, agent: str) -> str:
-        completed = self.rep_completed.get(agent) or u256(0)
-        failed = self.rep_failed.get(agent) or u256(0)
-        return f"Completed: {completed} | Failed: {failed}"
+        rep = self._get_rep()
+        if agent not in rep:
+            return "No reputation yet"
+        r = rep[agent]
+        return f"Completed: {r['completed']} | Failed: {r['failed']}"
 
     @gl.public.view
     def get_count(self) -> str:
@@ -85,8 +109,8 @@ class MultiAgentPro(gl.Contract):
 
     @gl.public.view
     def get_status(self, task_id: u256) -> str:
-        return self.status[task_id]
-
-    @gl.public.view
-    def get_result(self, task_id: u256) -> str:
-        return self.results[task_id]
+        tasks = self._get_tasks()
+        tid = str(int(task_id))
+        if tid not in tasks:
+            return "not found"
+        return tasks[tid]["status"]
