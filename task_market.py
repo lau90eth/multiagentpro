@@ -81,3 +81,12 @@ class MultiAgentPro(gl.Contract):
         if task_id == 1: return self.x1 or "not found"
         if task_id == 2: return self.x2 or "not found"
         return "not found"
+
+    @gl.public.view
+    def get_all(self) -> str:
+        n = int(self.n)
+        parts = []
+        if n > 0 and self.d0: parts.append(f"{self.d0}|{self.s0}|{self.w0}")
+        if n > 1 and self.d1: parts.append(f"{self.d1}|{self.s1}|{self.w1}")
+        if n > 2 and self.d2: parts.append(f"{self.d2}|{self.s2}|{self.w2}")
+        return ";;".join(parts)
