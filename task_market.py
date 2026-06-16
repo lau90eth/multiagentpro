@@ -25,9 +25,9 @@ class MultiAgentPro(gl.Contract):
     @gl.public.write
     def post_task(self, d: str, r: str, w: str) -> None:
         tid = int(self.n)
-        if tid == 0: self.d0=d[:200]; self.s0="open"; self.w0=w; self.x0=""
-        elif tid == 1: self.d1=d[:200]; self.s1="open"; self.w1=w; self.x1=""
-        elif tid == 2: self.d2=d[:200]; self.s2="open"; self.w2=w; self.x2=""
+        if tid == 0: self.d0=d[:200]; self.s0="open"; self.w0=str(w); self.x0=""
+        elif tid == 1: self.d1=d[:200]; self.s1="open"; self.w1=str(w); self.x1=""
+        elif tid == 2: self.d2=d[:200]; self.s2="open"; self.w2=str(w); self.x2=""
         else: return None
         self.n = str(tid + 1)
         return None
