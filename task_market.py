@@ -29,8 +29,9 @@ class MultiAgentPro(gl.Contract):
         return None
 
     @gl.public.write
-    def submit_result(self, task_id: str, result: str) -> None:
+    def submit_result(self, task_id: int, result: str) -> None:
         tasks = json.loads(self.tasks_json)
+        task_id = str(task_id)
         if task_id not in tasks:
             return None
         if tasks[task_id]["status"] != "open":
@@ -77,8 +78,9 @@ class MultiAgentPro(gl.Contract):
         return None
 
     @gl.public.view
-    def get_task(self, task_id: str) -> str:
+    def get_task(self, task_id: int) -> str:
         tasks = json.loads(self.tasks_json)
+        task_id = str(task_id)
         if task_id not in tasks:
             return "not found"
         t = tasks[task_id]
@@ -97,15 +99,17 @@ class MultiAgentPro(gl.Contract):
         return self.task_count
 
     @gl.public.view
-    def get_status(self, task_id: str) -> str:
+    def get_status(self, task_id: int) -> str:
         tasks = json.loads(self.tasks_json)
+        task_id = str(task_id)
         if task_id not in tasks:
             return "not found"
         return tasks[task_id]["status"]
 
     @gl.public.view
-    def get_result(self, task_id: str) -> str:
+    def get_result(self, task_id: int) -> str:
         tasks = json.loads(self.tasks_json)
+        task_id = str(task_id)
         if task_id not in tasks:
             return "not found"
         return tasks[task_id]["result"]
