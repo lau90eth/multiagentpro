@@ -38,7 +38,7 @@ class MultiAgentPro(gl.Contract):
             return None
         task = tasks[task_id]["description"]
         rubric = tasks[task_id]["rubric"]
-        agent = str(gl.message.sender_address)
+        agent = gl.message.sender_address.as_hex
 
         def leader_fn() -> str:
             prompt = (
