@@ -25,7 +25,7 @@ class MultiAgentPro(gl.Contract):
         self.rep_json = json.dumps(d)
 
     @gl.public.write
-    def post_task(self, description: str, rubric: str, reward_gen: u256) -> None:
+    def post_task(self, description: str, rubric: str, reward_gen: int) -> None:
         task_id = int(self.task_count)
         tasks = self._get_tasks()
         tasks[str(task_id)] = {
