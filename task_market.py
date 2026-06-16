@@ -3,184 +3,94 @@ from genlayer import *
 
 class MultiAgentPro(gl.Contract):
     task_count: str
-    t0_desc: str
-    t0_rubric: str
-    t0_reward: str
-    t0_status: str
-    t0_result: str
-    t1_desc: str
-    t1_rubric: str
-    t1_reward: str
-    t1_status: str
-    t1_result: str
-    t2_desc: str
-    t2_rubric: str
-    t2_reward: str
-    t2_status: str
-    t2_result: str
-    t3_desc: str
-    t3_rubric: str
-    t3_reward: str
-    t3_status: str
-    t3_result: str
-    t4_desc: str
-    t4_rubric: str
-    t4_reward: str
-    t4_status: str
-    t4_result: str
-    rep0_addr: str
-    rep0_completed: str
-    rep0_failed: str
-    rep1_addr: str
-    rep1_completed: str
-    rep1_failed: str
-    rep2_addr: str
-    rep2_completed: str
-    rep2_failed: str
+    t0d: str
+    t0r: str
+    t0w: str
+    t0s: str
+    t0x: str
+    t1d: str
+    t1r: str
+    t1w: str
+    t1s: str
+    t1x: str
+    t2d: str
+    t2r: str
+    t2w: str
+    t2s: str
+    t2x: str
+    t3d: str
+    t3r: str
+    t3w: str
+    t3s: str
+    t3x: str
+    t4d: str
+    t4r: str
+    t4w: str
+    t4s: str
+    t4x: str
 
     def __init__(self):
         self.task_count = "0"
-        self.t0_desc = ""; self.t0_rubric = ""; self.t0_reward = ""; self.t0_status = ""; self.t0_result = ""
-        self.t1_desc = ""; self.t1_rubric = ""; self.t1_reward = ""; self.t1_status = ""; self.t1_result = ""
-        self.t2_desc = ""; self.t2_rubric = ""; self.t2_reward = ""; self.t2_status = ""; self.t2_result = ""
-        self.t3_desc = ""; self.t3_rubric = ""; self.t3_reward = ""; self.t3_status = ""; self.t3_result = ""
-        self.t4_desc = ""; self.t4_rubric = ""; self.t4_reward = ""; self.t4_status = ""; self.t4_result = ""
-        self.rep0_addr = ""; self.rep0_completed = "0"; self.rep0_failed = "0"
-        self.rep1_addr = ""; self.rep1_completed = "0"; self.rep1_failed = "0"
-        self.rep2_addr = ""; self.rep2_completed = "0"; self.rep2_failed = "0"
-
-    def _get_field(self, tid: int, field: str) -> str:
-        if tid == 0:
-            if field == "desc": return self.t0_desc
-            if field == "rubric": return self.t0_rubric
-            if field == "reward": return self.t0_reward
-            if field == "status": return self.t0_status
-            if field == "result": return self.t0_result
-        if tid == 1:
-            if field == "desc": return self.t1_desc
-            if field == "rubric": return self.t1_rubric
-            if field == "reward": return self.t1_reward
-            if field == "status": return self.t1_status
-            if field == "result": return self.t1_result
-        if tid == 2:
-            if field == "desc": return self.t2_desc
-            if field == "rubric": return self.t2_rubric
-            if field == "reward": return self.t2_reward
-            if field == "status": return self.t2_status
-            if field == "result": return self.t2_result
-        if tid == 3:
-            if field == "desc": return self.t3_desc
-            if field == "rubric": return self.t3_rubric
-            if field == "reward": return self.t3_reward
-            if field == "status": return self.t3_status
-            if field == "result": return self.t3_result
-        if tid == 4:
-            if field == "desc": return self.t4_desc
-            if field == "rubric": return self.t4_rubric
-            if field == "reward": return self.t4_reward
-            if field == "status": return self.t4_status
-            if field == "result": return self.t4_result
-        return ""
-
-    def _set_field(self, tid: int, field: str, value: str) -> None:
-        if tid == 0:
-            if field == "desc": self.t0_desc = value
-            elif field == "rubric": self.t0_rubric = value
-            elif field == "reward": self.t0_reward = value
-            elif field == "status": self.t0_status = value
-            elif field == "result": self.t0_result = value
-        elif tid == 1:
-            if field == "desc": self.t1_desc = value
-            elif field == "rubric": self.t1_rubric = value
-            elif field == "reward": self.t1_reward = value
-            elif field == "status": self.t1_status = value
-            elif field == "result": self.t1_result = value
-        elif tid == 2:
-            if field == "desc": self.t2_desc = value
-            elif field == "rubric": self.t2_rubric = value
-            elif field == "reward": self.t2_reward = value
-            elif field == "status": self.t2_status = value
-            elif field == "result": self.t2_result = value
-        elif tid == 3:
-            if field == "desc": self.t3_desc = value
-            elif field == "rubric": self.t3_rubric = value
-            elif field == "reward": self.t3_reward = value
-            elif field == "status": self.t3_status = value
-            elif field == "result": self.t3_result = value
-        elif tid == 4:
-            if field == "desc": self.t4_desc = value
-            elif field == "rubric": self.t4_rubric = value
-            elif field == "reward": self.t4_reward = value
-            elif field == "status": self.t4_status = value
-            elif field == "result": self.t4_result = value
-        return None
+        self.t0d=""; self.t0r=""; self.t0w=""; self.t0s=""; self.t0x=""
+        self.t1d=""; self.t1r=""; self.t1w=""; self.t1s=""; self.t1x=""
+        self.t2d=""; self.t2r=""; self.t2w=""; self.t2s=""; self.t2x=""
+        self.t3d=""; self.t3r=""; self.t3w=""; self.t3s=""; self.t3x=""
+        self.t4d=""; self.t4r=""; self.t4w=""; self.t4s=""; self.t4x=""
 
     @gl.public.write
-    def post_task(self, description: str, rubric: str, reward: str) -> None:
+    def post_task(self, d: str, r: str, w: str) -> None:
         tid = int(self.task_count)
-        if tid > 4:
-            return None
-        self._set_field(tid, "desc", description[:300])
-        self._set_field(tid, "rubric", rubric[:200])
-        self._set_field(tid, "reward", reward)
-        self._set_field(tid, "status", "open")
-        self._set_field(tid, "result", "")
+        if tid == 0: self.t0d=d[:200]; self.t0r=r[:150]; self.t0w=w; self.t0s="open"; self.t0x=""
+        elif tid == 1: self.t1d=d[:200]; self.t1r=r[:150]; self.t1w=w; self.t1s="open"; self.t1x=""
+        elif tid == 2: self.t2d=d[:200]; self.t2r=r[:150]; self.t2w=w; self.t2s="open"; self.t2x=""
+        elif tid == 3: self.t3d=d[:200]; self.t3r=r[:150]; self.t3w=w; self.t3s="open"; self.t3x=""
+        elif tid == 4: self.t4d=d[:200]; self.t4r=r[:150]; self.t4w=w; self.t4s="open"; self.t4x=""
+        else: return None
         self.task_count = str(tid + 1)
         return None
 
     @gl.public.write
     def submit_result(self, task_id: int, result: str) -> None:
         tid = task_id
-        if self._get_field(tid, "status") != "open":
-            return None
-        task = self._get_field(tid, "desc")
-        rubric = self._get_field(tid, "rubric")
-        agent = "0x" + gl.message.sender_address.as_bytes.hex()
+        if tid == 0: desc=self.t0d; rubric=self.t0r; status=self.t0s
+        elif tid == 1: desc=self.t1d; rubric=self.t1r; status=self.t1s
+        elif tid == 2: desc=self.t2d; rubric=self.t2r; status=self.t2s
+        elif tid == 3: desc=self.t3d; rubric=self.t3r; status=self.t3s
+        elif tid == 4: desc=self.t4d; rubric=self.t4r; status=self.t4s
+        else: return None
+        if status != "open": return None
 
         def leader_fn() -> str:
-            prompt = (
-                f"Judge this AI agent's work.\n"
-                f"Task: {task}\n"
-                f"Rubric: {rubric}\n"
-                f"Result: {result[:500]}\n"
-                f"Reply ONLY: APPROVED or REJECTED"
-            )
-            return gl.nondet.exec_prompt(prompt).replace('\x00', '').strip()
+            prompt = (f"Judge this work.\nTask: {desc}\nRubric: {rubric}\n"
+                      f"Result: {result[:400]}\nReply ONLY: APPROVED or REJECTED")
+            return gl.nondet.exec_prompt(prompt).replace('\x00','').strip()
 
-        def validator_fn(leaders_res) -> bool:
-            if not isinstance(leaders_res, gl.vm.Return):
-                return False
-            r = leaders_res.calldata
-            return isinstance(r, str) and r.strip() in ("APPROVED", "REJECTED")
+        def validator_fn(lr) -> bool:
+            if not isinstance(lr, gl.vm.Return): return False
+            r = lr.calldata
+            return isinstance(r, str) and r.strip() in ("APPROVED","REJECTED")
 
-        verdict = gl.vm.run_nondet_unsafe(leader_fn, validator_fn)
-        verdict = verdict.replace('\x00', '').strip()
-        self._set_field(tid, "result", result[:300])
-        self._set_field(tid, "status", "completed" if verdict == "APPROVED" else "failed")
+        verdict = gl.vm.run_nondet_unsafe(leader_fn, validator_fn).replace('\x00','').strip()
+        vs = "completed" if verdict == "APPROVED" else "failed"
+        res = result[:200]
 
-        for i in range(3):
-            addr_field = f"rep{i}_addr"
-            addr = getattr(self, addr_field)
-            if addr == agent or addr == "":
-                setattr(self, addr_field, agent)
-                comp = getattr(self, f"rep{i}_completed")
-                fail = getattr(self, f"rep{i}_failed")
-                if verdict == "APPROVED":
-                    setattr(self, f"rep{i}_completed", str(int(comp) + 1))
-                else:
-                    setattr(self, f"rep{i}_failed", str(int(fail) + 1))
-                break
+        if tid == 0: self.t0s=vs; self.t0x=res
+        elif tid == 1: self.t1s=vs; self.t1x=res
+        elif tid == 2: self.t2s=vs; self.t2x=res
+        elif tid == 3: self.t3s=vs; self.t3x=res
+        elif tid == 4: self.t4s=vs; self.t4x=res
         return None
 
     @gl.public.view
     def get_task(self, task_id: int) -> str:
-        tid = task_id
-        desc = self._get_field(tid, "desc")
-        if not desc:
-            return "not found"
-        status = self._get_field(tid, "status")
-        reward = self._get_field(tid, "reward")
-        return f"Task: {desc} | Status: {status} | Reward: {reward}"
+        if task_id == 0: d=self.t0d; s=self.t0s; w=self.t0w
+        elif task_id == 1: d=self.t1d; s=self.t1s; w=self.t1w
+        elif task_id == 2: d=self.t2d; s=self.t2s; w=self.t2w
+        elif task_id == 3: d=self.t3d; s=self.t3s; w=self.t3w
+        elif task_id == 4: d=self.t4d; s=self.t4s; w=self.t4w
+        else: return "not found"
+        if not d: return "not found"
+        return f"Task: {d} | Status: {s} | Reward: {w}"
 
     @gl.public.view
     def get_count(self) -> str:
@@ -188,22 +98,18 @@ class MultiAgentPro(gl.Contract):
 
     @gl.public.view
     def get_status(self, task_id: int) -> str:
-        return self._get_field(task_id, "status") or "not found"
+        if task_id == 0: return self.t0s or "not found"
+        if task_id == 1: return self.t1s or "not found"
+        if task_id == 2: return self.t2s or "not found"
+        if task_id == 3: return self.t3s or "not found"
+        if task_id == 4: return self.t4s or "not found"
+        return "not found"
 
     @gl.public.view
     def get_result(self, task_id: int) -> str:
-        return self._get_field(task_id, "result") or "not found"
-
-    @gl.public.view
-    def get_rubric(self, task_id: int) -> str:
-        return self._get_field(task_id, "rubric") or "not found"
-
-    @gl.public.view
-    def get_reputation(self, agent: str) -> str:
-        for i in range(3):
-            addr = getattr(self, f"rep{i}_addr")
-            if addr == agent:
-                c = getattr(self, f"rep{i}_completed")
-                f = getattr(self, f"rep{i}_failed")
-                return f"Completed: {c} | Failed: {f}"
-        return "no reputation"
+        if task_id == 0: return self.t0x or "not found"
+        if task_id == 1: return self.t1x or "not found"
+        if task_id == 2: return self.t2x or "not found"
+        if task_id == 3: return self.t3x or "not found"
+        if task_id == 4: return self.t4x or "not found"
+        return "not found"
