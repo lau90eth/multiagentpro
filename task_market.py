@@ -3,62 +3,49 @@ from genlayer import *
 import json
 
 class MultiAgentPro(gl.Contract):
-    task_count: u256
+    task_count: str
     tasks_json: str
     rep_json: str
 
     def __init__(self):
-        self.task_count = 0
+        self.task_count = "0"
         self.tasks_json = "{}"
         self.rep_json = "{}"
 
-    def _get_tasks(self) -> dict:
-        return json.loads(self.tasks_json)
-
-    def _set_tasks(self, d: dict):
-        self.tasks_json = json.dumps(d)
-
-    def _get_rep(self) -> dict:
-        return json.loads(self.rep_json)
-
-    def _set_rep(self, d: dict):
-        self.rep_json = json.dumps(d)
-
     @gl.public.write
-    def post_task(self, description: str, rubric: str, reward_gen: int) -> None:
-        task_id = int(self.task_count)
-        tasks = self._get_tasks()
-        tasks[str(task_id)] = {
+    def post_task(self, description: str, rubric: str, reward: str) -> None:
+        task_id = self.task_count
+        tasks = json.loads(self.tasks_json)
+        tasks[task_id] = {
             "description": description[:500],
             "rubric": rubric[:300],
-            "reward": int(reward_gen),
+            "reward": reward,
             "status": "open",
             "result": "",
-            "submitter": "",
-            "poster": str(gl.message.sender_address)
+            "submitter": ""
         }
-        self._set_tasks(tasks)
-        self.task_count = self.task_count + 1
+        self.tasks_json = json.dumps(tasks)
+        self.task_count = str(int(self.task_count) + 1)
+        return None
 
     @gl.public.write
-    def submit_result(self, task_id: int, result: str) -> None:
-        tasks = self._get_tasks()
-        tid = str(int(task_id))
-        if tid not in tasks:
-            raise Exception("Task not found")
-        if tasks[tid]["status"] != "open":
-            raise Exception("Task not open")
-        task = tasks[tid]["description"]
-        rubric = tasks[tid]["rubric"]
+    def submit_result(self, task_id: str, result: str) -> None:
+        tasks = json.loads(self.tasks_json)
+        if task_id not in tasks:
+            return None
+        if tasks[task_id]["status"] != "open":
+            return None
+        task = tasks[task_id]["description"]
+        rubric = tasks[task_id]["rubric"]
         agent = str(gl.message.sender_address)
 
         def leader_fn() -> str:
             prompt = (
-                f"You are a fair judge evaluating an AI agent's work.\n\n"
-                f"Task: {task}\n\n"
-                f"Evaluation rubric: {rubric}\n\n"
-                f"Submitted result: {result[:800]}\n\n"
-                f"Does the result satisfy the rubric? Reply ONLY: APPROVED or REJECTED"
+                f"Judge this AI agent's work.\n"
+                f"Task: {task}\n"
+                f"Rubric: {rubric}\n"
+                f"Result: {result[:600]}\n"
+                f"Reply ONLY: APPROVED or REJECTED"
             )
             return gl.nondet.exec_prompt(prompt).replace('\x00', '').strip()
 
@@ -71,56 +58,54 @@ class MultiAgentPro(gl.Contract):
         verdict = gl.vm.run_nondet_unsafe(leader_fn, validator_fn)
         verdict = verdict.replace('\x00', '').strip()
 
-        tasks[tid]["result"] = result[:500]
-        tasks[tid]["submitter"] = agent
+        tasks[task_id]["result"] = result[:500]
+        tasks[task_id]["submitter"] = agent
 
-        rep = self._get_rep()
+        rep = json.loads(self.rep_json)
         if agent not in rep:
-            rep[agent] = {"completed": 0, "failed": 0}
+            rep[agent] = {"completed": "0", "failed": "0"}
 
         if verdict == "APPROVED":
-            tasks[tid]["status"] = "completed"
-            rep[agent]["completed"] += 1
+            tasks[task_id]["status"] = "completed"
+            rep[agent]["completed"] = str(int(rep[agent]["completed"]) + 1)
         else:
-            tasks[tid]["status"] = "failed"
-            rep[agent]["failed"] += 1
+            tasks[task_id]["status"] = "failed"
+            rep[agent]["failed"] = str(int(rep[agent]["failed"]) + 1)
 
-        self._set_tasks(tasks)
-        self._set_rep(rep)
+        self.tasks_json = json.dumps(tasks)
+        self.rep_json = json.dumps(rep)
+        return None
 
     @gl.public.view
-    def get_task(self, task_id: int) -> str:
-        tasks = self._get_tasks()
-        tid = str(int(task_id))
-        if tid not in tasks:
-            return "Task not found"
-        t = tasks[tid]
-        return f"Task: {t['description']} | Rubric: {t['rubric']} | Status: {t['status']} | Reward: {t['reward']} GEN"
+    def get_task(self, task_id: str) -> str:
+        tasks = json.loads(self.tasks_json)
+        if task_id not in tasks:
+            return "not found"
+        t = tasks[task_id]
+        return f"Task: {t['description']} | Status: {t['status']} | Reward: {t['reward']}"
 
     @gl.public.view
     def get_reputation(self, agent: str) -> str:
-        rep = self._get_rep()
+        rep = json.loads(self.rep_json)
         if agent not in rep:
-            return "No reputation yet"
+            return "no reputation"
         r = rep[agent]
         return f"Completed: {r['completed']} | Failed: {r['failed']}"
 
     @gl.public.view
     def get_count(self) -> str:
-        return str(self.task_count)
+        return self.task_count
 
     @gl.public.view
-    def get_status(self, task_id: int) -> str:
-        tasks = self._get_tasks()
-        tid = str(int(task_id))
-        if tid not in tasks:
+    def get_status(self, task_id: str) -> str:
+        tasks = json.loads(self.tasks_json)
+        if task_id not in tasks:
             return "not found"
-        return tasks[tid]["status"]
+        return tasks[task_id]["status"]
 
     @gl.public.view
-    def get_result(self, task_id: int) -> str:
-        tasks = self._get_tasks()
-        tid = str(int(task_id))
-        if tid not in tasks:
+    def get_result(self, task_id: str) -> str:
+        tasks = json.loads(self.tasks_json)
+        if task_id not in tasks:
             return "not found"
-        return tasks[tid]["result"]
+        return tasks[task_id]["result"]
