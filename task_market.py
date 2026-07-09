@@ -70,7 +70,7 @@ class MultiAgentPro(gl.Contract):
         else: return None
         if status != "open": return None
 
-        agent = agent_id[:42]
+        agent = str(agent_id)[:42]
 
         def leader_fn() -> str:
             prompt = (
